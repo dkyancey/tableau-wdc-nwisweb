@@ -1,2 +1,2 @@
-# WDC
+# Web Data Connectors
 

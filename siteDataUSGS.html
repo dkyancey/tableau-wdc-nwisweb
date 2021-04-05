@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC >
+<html>
+<head>
+    <title>USGS Site Data</title>
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta name="publisher" content="USGS - U.S. Geological Survey, Water Resources">
+    <meta name="author" content="David K.Yancey, CAWSC, dkyancey@usgs.gov">
+    <meta name="description" content="Tableau web data connector - single USGS site">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <link href="https://water.usgs.gov/styles/common.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+    <script src="https://connectors.tableau.com/libs/tableauwdc-2.3.latest.js" type="text/javascript"></script>
+
+    <script src="data/sitenames.js" type="text/javascript" ></script> 
+    <script src="data/parameters.js" type="text/javascript" ></script> 
+    <script src="data/qualifiers.js" type="text/javascript" ></script> 
+
+    <script src="js/isusgs.js" type="text/javascript" ></script> 
+    <script type="text/javascript">
+        var scpt = "script";
+        if (isUSGS('<!--#echo var="REMOTE_ADDR"-->')){
+            document.writeln('<'+scpt+' src="data/parmselect.js" type="text/javascript" ></'+scpt+'>');
+        } else {
+            document.writeln('<'+scpt+' src="data/parmselect_0.js" type="text/javascript" ></'+scpt+'>');
+        }
+
+        function isUSGS(ip) {
+	        for (var k = 0; k <= usgsIPs.length; k++) {
+		        if (ip.indexOf(usgsIPs[k]) == 0 ) {
+                                console.log("USGS");
+			        return true;
+		        }
+	        }
+                console.log("Public");
+	        return false;
+        }
+    </script>
+    <script src="js/siteDataUSGS.js" type="text/javascript"></script>
+
+    <!-- datepicker-->
+    <!--https://jqueryui.com/datepicker/-->
+    <link rel="stylesheet" type="text/css" href="tcal/1-simple-calendar/tcal.css" />
+    <script type="text/javascript" src="tcal/1-simple-calendar/tcal.js"></script> 
+</head>
+
+<body>
+<noscript>
+    <strong>Tableau web-data-connector requires that JavaScript be enabled. Please enable it to continue.</strong>
+</noscript>
+
+<div id="usgsbanner">
+    <img src="images/usgs_banner.png" height="72" width="100%" />
+</div>
+
+<div class="container container-table" style="position: relative;"
+    <div class="row vertical-center-row">
+        <div class="text-center col-md-4 col-md-offset-4">
+            <h3>USGS Site Data Connector for Tableau<sup style="font-size:small" >&reg;</sup></h3>
+            <form>
+                <div class="form-inline"> </div>
+		    <div class="form-inline">
+                   	<label for="site_no" class="text-center">Enter one or more USGS Gage Site(s)<span id="siteErrMsg" style="color:red" ></span></label><span class="infobox" style="z-index:5" ><sup><img src="images/questionmark.png" height="12" /></sup><div class="about">Enter a single, 8- to 15-digit USGS site number. <br>Go to <a href="https://maps.waterdata.usgs.gov/mapper/" target="_blank" style="color:cyan" >NWISWeb Mapper</a> to locate gage.</div> </span><br>
+                        <input type="radio" checked="true" name="siteSel" id="site_no_btn" onclick='document.getElementById("siteInput").style.display="inline";document.getElementById("siteName").innerHTML="";document.getElementById("site_match").style.display="none";document.getElementById("siteInput").innerHTML="<input id=\"site_no\" value=\"Site number\" type=\"text\" onfocus=this.value=\"\" onchange=\"getSiteParmsById()\" />"' />&nbsp;<label for="site_no"> By site number</label>
+                        &nbsp;&nbsp;
+                        <input type="radio" id="site_nm_btn" name="siteSel" onclick='document.getElementById("siteInput").style.display="inline";document.getElementById("siteName").innerHTML="";document.getElementById("siteInput").innerHTML="<input id=\"site_nm\" value=\"Partial site name\" type=\"text\" onfocus=this.value=\"\" onchange=\"getSiteNames()\" />"' />&nbsp;<label for="site_nm">By site name</label>&nbsp;<span class="infobox" style="z-index:5" ><sup><img src="images/questionmark.png" height="12" /></sup><div class="about">Enter a partial name, case independent, and unique to the site you want to find.</div> </span><br>
+
+                        <span id="siteInput" style="display:inline"><input id="site_no" value="Site number" type="text" onfocus=this.value="" onchange="getSiteParmsById()" /></span>&nbsp;<span id="go"><a href="javascript:void(0)" ><img src="images/dn-arrow.png" height="20" title="Submit" alt="Submit" /></a></span><br>
+			<span id="siteName" style="color:navy;font-weight:bold"></span><br>
+
+                        <div id="site_match" style="display:none">
+   			<label for="site_no" class="text-center">Matching Sites</label><br>
+		        <p id="siteSelect" onchange="getSiteParmsByName()" style="display:inline">
+				<select id="site_no" size="5" \>
+				</select>
+			</p>
+                        </div>
+                        <br>
+
+   			<label for="site-parms" class="text-center">Available Parameters <span id="access"></span></label><br>
+			<span id="selParms">Enter a site above to see its data parameters</span><br>
+		        <p id="parmSelect" style="display:inline">
+				<select id="site-parms" size="5" multiple="true" \>
+				</select>
+			</p>
+                        <br><br>
+                        <script>
+			if (isUSGS('<!--#echo var="REMOTE_ADDR"-->')){
+                            console.log("USGS");
+                            $('#access').html("(USGS internal):");
+                            document.writeln('<input type="hidden" id="access_level" value="3" />');
+			} else {
+                            document.writeln('<input type="hidden" id="access_level" value="3" />');
+			}
+                        </script>
+
+			<label for="start-date-one" class="text-center">Start Date</span></label><br>
+                        <input autocomplete="off" type="text" id="start-date-one" name="start-date-one" class="tcal" value="" />
+
+		       	<br><label for="end-date-one" class="text-center">End Date</label><br>
+                        <script>
+		        // set To date = today
+		        var toTime = new Date();
+		        var toTimeIso = toTime.toISOString();
+		        var toDT = toTimeIso.split("T");
+		        var ymd = [];
+		        ymd = toDT[0].split('-');
+		        toDT[0] = ymd[1]+"/"+ymd[2]+"/"+ymd[0];
+                        document.writeln('<input autocomplete="off" type="text" id="end-date-one" name="end-date-one" class="tcal" value="'+toDT[0]+'" />');
+                        </script>
+			<div id="errorMsg" style="color:red" ></div>
+
+		    </div>
+		</form>
+		<button onclick="location.reload()" type="button" id="reset" class="btn btn-default" style="margin: 10px;">Reset</button>
+		<button type="button" id="submitButton" class="btn btn-success" style="margin: 10px;">Get Site Data</button>
+                <br /><br />
+
+            <script>
+            // Create the connector object
+            function getSiteNames() {
+                document.getElementById("site_match").style.display="inline";
+                // clear the select elements
+                var s = document.getElementById("site_no");
+                var numopts = s.options.length;
+                for (i = numopts-1; i >= 0; i--) {
+                    s.options[i] = null;
+                }
+
+                // populate the select elements
+                var str = document.getElementById("site_nm").value;
+                var words = (str.match(/(\w[+#]+|\w+)/g));	// extract only words into array
+                var join = words.join();			// join words in array 
+                var s = join.replace(',',' ');			// replace commas with spaces
+
+                // see https://stackoverflow.com/questions/7241878/for-in-loops-in-javascript-key-value-pairs
+                var match = 0;
+                for (const [key, value] of Object.entries(sitename)) {
+                    //console.log(key, value);
+                    if (value.toLowerCase().indexOf(s.toLowerCase()) >= 0) {
+                       match++;
+                       $( 'select[id="site_no"]' ).append( '<option value="'+key+'">'+value+'</option>' );
+                    }
+                }
+                if (match < 1) {
+                    $('#site_no').html("<select id='site_no' size='5' \> <option style='color:red' value='null'>No matches found</option> </select>");
+               } else if (match > 20) {
+                    $('#site_no').html("<select id='site_no' size='5' \> <option style='color:red' value='null'>Too many matches ("+match+"). Please enter a more specific name</option> </select>");
+               }
+            }
+            function getSiteParmsByName() {
+                $('#go').html('');
+                 // clear the select elements
+                var s = document.getElementById("site-parms");
+                var numopts = s.options.length;
+                for (i = numopts-1; i >= 0; i--) {
+                    s.options[i] = null;
+                }
+
+                // populate the select elements
+                var v = document.getElementById("site_no").value;
+                if (siteparms[v] == undefined) {
+                    $( 'select[id="site-parms"]' ).append( '<option style="color:red" value="null">'+v+' is not a valid site number</option>' );
+                } else {
+                    document.getElementById("site_match").style.display="none";
+                    document.getElementById("siteInput").style.display="none";
+                    $( 'select[id="site-parms"]' ).append( siteparms[v] );
+                    $('#selParms').html("Select one or more:");
+                    $('#siteName').html(v+' '+sitename[v]);
+               }
+            }
+            function getSiteParmsById() {
+                $('#go').html('');
+                 // clear the select elements
+                var s = document.getElementById("site-parms");
+                var numopts = s.options.length;
+                for (i = numopts-1; i >= 0; i--) {
+                    s.options[i] = null;
+                }
+
+                // populate the select elements
+                var v = document.getElementById("site_no").value;
+                if (siteparms[v] == undefined || isNaN(v)) {
+                    $( 'select[id="site-parms"]' ).append( '<option style="color:red" value="null">'+v+' is not a valid site number</option>' );
+                } else {
+                    $( 'select[id="site-parms"]' ).append( siteparms[v] );
+                    $('#selParms').html("Select one or more:");
+                    document.getElementById("siteInput").style.display="none";
+                    $('#siteName').html(v+' '+sitename[v]);
+               }
+            }
+            </script>
+        </div>
+    </div>
+</div>
+
+<div id="usgsfooterbar">
+    <table border="0" width="100%" ><tr bgcolor="#132747" style="margin-right:1em" ><td width="90%">
+       <div style="color:white;font-size:12px;font-family:verdana">
+          <!-- footer nav links -->
+          <ul class="menu nav">
+            <span >
+              <a href="https://www.doi.gov/privacy" target="_blank" >DOI Privacy Policy</a>
+            </span>
+            <span >
+              <a href="https://www.usgs.gov/laws/policies_notices.html" target="_blank"  >Legal</a >
+            </span>
+            <span >
+              <a href="https://www2.usgs.gov/laws/accessibility.html" target="_blank"  >Accessibility</a >
+            </span>
+            <span >
+              <a href="https://answers.usgs.gov/" target="_blank" >Contact USGS</a>
+            </span>
+          <!--/ footer nav links -->
+        </div>
+        <!-- /.footer-doi -->
+        </td><td align="left" style="padding:.5em">
+        <span style="color:white;font-size:15px;font-family:verdana">
+            USGS CAWSC <br />
+            David Yancey<br />
+            dkyancey<img src="images/at.png" height="13" alt="-at-" />usgs.gov
+        </span>
+    </td></tr></table>
+</div>
+
+</body>
+</html>

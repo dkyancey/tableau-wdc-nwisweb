@@ -1,0 +1,32 @@
+#format {
+    width: 50%;
+    margin: auto;
+    text-align: center;
+}
+
+#site-parms{ width:80%;   }
+html, body {
+    height: 100%;
+}
+
+.infobox {      
+    display:inline; 
+    z-index:1;      
+    position:relative;
+    background-color:transparent;
+    padding:1px;    
+    font-size:small;
+	}
+.infobox .about {display:none;}
+.infobox:hover .about {               
+    display:block;
+    color:white;
+    position:absolute;
+    left:5px;
+    top:5px;
+    width:200px;
+    padding:5px 5px 5px;
+    border:1px solid #009;
+    background-color:navy;
+}
+

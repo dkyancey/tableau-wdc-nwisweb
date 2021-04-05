@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+#
+if cd /Users/dkyancey/Sites/wdc/data/ ; then
+  wget -qO- 'https://nwis.waterdata.usgs.gov/nwisweb/data/img/SERIES_CATALOG_dump_for_WaterAlert_tsid.rdb.gz' | gunzip -c > ../data/sites_iv_0.rdb
+  wget -qO- 'https://nwis.waterdata.usgs.gov/nwisweb/data/img/SERIES_CATALOG_dump_UV_ALL.rdb.gz' | gunzip -c > ../data/sites_iv.rdb
+  wget -qO- 'https://nwis.waterdata.usgs.gov/nwisweb/data/img/SERIES_CATALOG_dump_DV_ALL.rdb.gz' | gunzip -c > ../data/sites_dv.rdb
+  ../scripts/upd_parmcodes.pl pl > parmcodes.pl 
+  ../scripts/upd_parmcodes.pl js > parmcodes.js 
+  ../scripts/upd_siteparms_js.pl > siteparms.js
+  ../scripts/upd_siteparms_0_js.pl > siteparms_0.js
+  ../scripts/upd_sitenames_js.pl > sitenames.js
+  ../scripts/upd_parmselect_js.pl >parmselect.js
+  ../scripts/upd_parmselect_0_js.pl >parmselect_0.js
+fi

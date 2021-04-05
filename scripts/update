@@ -1,0 +1,1 @@
+rsync --update --delete --exclude data --exclude upd_data -avz --exclude=update /Users/dkyancey/Sites/wdc/ water.wr.usgs.gov:public_html/wdc/ 
